@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Till &amp; Petty</title>
+<meta name="theme-color" content="#E9EDF1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121518" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Till">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#E9EDF1; --sheet:#FFFFFF; --shade:#F1F3F6;
+  --ink:#15181C; --muted:#56606B; --rule:#2B3138; --hair:#CDD3DA;
+  --bad:#B42318; --bad-bg:#FCE9E7; --good:#1C6B38; --good-bg:#E3F1E7; --hl:#FFF1B8;
+  --on-dark:#FFFFFF; --on-light:#15181C;
+  /* ABA currency-strap and coin-wrapper colors */
+  --c-100:#C9A227; --c-50:#7A4E2D; --c-20:#6B3FA0; --c-10:#F2C230; --c-5:#C42F2A; --c-1:#2B62C4;
+  --c-q:#E07B1F; --c-d:#2E7D3E; --c-n:#2B5FB4; --c-p:#B3302A;
+  --font:"Public Sans",system-ui,-apple-system,sans-serif;
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --ground:#121518; --sheet:#1C2025; --shade:#242930;
+    --ink:#ECEFF2; --muted:#A2ACB7; --rule:#68717C; --hair:#363D46;
+    --bad:#FF8A7A; --bad-bg:#3A201D; --good:#74D49A; --good-bg:#183222; --hl:#3D3416;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--ground);color:var(--ink);font-family:var(--font);
+  font-size:16px;line-height:1.45;font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+  padding-top:env(safe-area-inset-top,0px);
+}
+::selection{background:var(--c-20);color:var(--on-dark)}
+button,input,textarea{font:inherit;color:inherit;font-variant-numeric:tabular-nums}
+button{cursor:pointer;border:0;background:none;padding:0}
+:focus-visible{outline:3px solid var(--c-20);outline-offset:2px;border-radius:4px}
+svg.i{width:22px;height:22px;flex:none}
+
+.wrap{max-width:560px;margin:0 auto;padding:0 12px 148px}
+header.top{position:sticky;top:0;z-index:30;background:var(--ground);padding:12px 2px 10px}
+.brandline{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.brand{font-weight:800;font-size:19px;letter-spacing:-.01em}
+.chip{font-size:14px;font-weight:700;padding:3px 12px;border-radius:999px;border:2px solid var(--hair);color:var(--muted)}
+.chip.on{border-color:var(--ink);color:var(--ink)}
+/* progress reads as a strap: four bands in the bill colors the steps handle */
+.track{display:flex;gap:3px;margin-top:10px}
+.track i{flex:1;height:6px;background:var(--hair)}
+.track i:first-child{border-radius:3px 0 0 3px}.track i:last-child{border-radius:0 3px 3px 0}
+.track i.done,.track i.now{background:var(--ink)}
+.track i.now{background:var(--c-20)}
+.stepname{margin-top:7px;font-size:14px;color:var(--muted)}
+.stepname b{color:var(--ink);font-weight:700}
+
+.paper{background:var(--sheet);border:1px solid var(--hair);border-radius:6px;padding:14px 10px 16px;margin-top:12px}
+.ptitle{text-align:center;font-weight:800;font-size:18px;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;margin:0}
+.titlerow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px}
+.titlerow .ptitle{text-align:left;font-size:17px;line-height:1.25;min-width:0}
+.tools{display:flex;gap:6px}
+.pnote{font-size:14.5px;margin:10px 2px 0;color:var(--muted)}
+.pnote::before{content:"* "}
+
+.hdr{display:flex;gap:10px;flex-wrap:wrap;font-weight:700;font-size:15px;margin-bottom:12px}
+.hdr label{display:flex;align-items:baseline;gap:6px;flex:1;min-width:120px}
+.hdr input,.hdr .val{flex:1;min-width:0;border:0;border-bottom:2px solid var(--rule);background:transparent;font-weight:600;font-size:16px;padding:2px;border-radius:0}
+
+table.sheet{width:100%;border-collapse:collapse;table-layout:fixed}
+.sheet th{font-weight:700;font-size:14.5px;text-align:center;padding:2px 0 6px;color:var(--muted)}
+.sheet td{border:1px solid var(--rule);padding:0;height:50px;vertical-align:middle}
+.sheet col.c1{width:29%}.sheet col.c3{width:30%}
+/* the signature: each denomination cell is its own currency strap */
+.sheet td.dn{padding:0}
+.band{display:flex;flex-direction:column;justify-content:center;height:100%;padding:0 10px;background:var(--bc);color:var(--bt)}
+.band .dl{font-weight:800;font-size:17px;line-height:1.1;letter-spacing:-.01em}
+.band .dl small{font-size:13px;font-weight:700;margin-right:2px}
+.band .par{font-size:12px;font-weight:600;line-height:1.15;margin-top:1px}
+.band .par:empty{display:none}
+.k-b100{--bc:var(--c-100);--bt:var(--on-light)} .k-b50{--bc:var(--c-50);--bt:var(--on-dark)}
+.k-b20{--bc:var(--c-20);--bt:var(--on-dark)} .k-b10{--bc:var(--c-10);--bt:var(--on-light)}
+.k-b5{--bc:var(--c-5);--bt:var(--on-dark)} .k-b1{--bc:var(--c-1);--bt:var(--on-dark)}
+.k-q{--bc:var(--c-q);--bt:var(--on-light)} .k-d{--bc:var(--c-d);--bt:var(--on-dark)}
+.k-n{--bc:var(--c-n);--bt:var(--on-dark)} .k-p{--bc:var(--c-p);--bt:var(--on-dark)}
+.sheet td.lb{padding:0 10px;font-weight:700;font-size:15.5px}
+.sheet td.lb small{display:block;font-size:12.5px;color:var(--muted);font-weight:500;line-height:1.15}
+.sheet td.tt{text-align:right;padding:0 8px;font-weight:600;font-size:17px;white-space:nowrap}
+.sheet td.ctr{text-align:center;font-weight:700;font-size:17px}
+.sheet td.mute{color:var(--muted);text-align:center}
+.sheet tr.sum td{background:var(--shade)}
+.sheet tr.sum td.tt{font-size:18px;font-weight:800}
+.sheet tr.grand td{border-width:2px}
+.sheet tr.grand td.tt{font-size:18px;font-weight:800}
+.sheet tr.sub td{height:38px;background:var(--shade)}
+.sheet tr.sub td.lb,.sheet tr.sub td.tt,.sheet tr.sub td.ctr{font-size:14.5px;color:var(--muted)}
+.sheet tr.flag td:not(.dn){background:var(--hl)}
+.band .par.flag{font-weight:800;background:var(--sheet);color:var(--bad);border-radius:3px;padding:0 4px;align-self:flex-start}
+
+.step{display:flex;align-items:stretch;height:100%}
+.step button{width:40px;display:grid;place-items:center;color:var(--muted);flex:none}
+.step button:active{background:var(--shade);color:var(--ink)}
+.step input{flex:1;min-width:0;border:0;border-left:1px solid var(--hair);border-right:1px solid var(--hair);text-align:center;font-size:19px;font-weight:800;background:transparent;border-radius:0}
+.cellin{width:100%;height:100%;border:0;background:transparent;font-weight:700;font-size:17px;padding:0 10px;border-radius:0}
+.cellin.r{text-align:right}.cellin.c{text-align:center}
+.cellin::placeholder{color:var(--muted);opacity:.5;font-weight:500}
+
+.boxes{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.boxes.two{grid-template-columns:1fr 1fr}
+.box{border:2px solid var(--rule);border-radius:3px;background:var(--sheet);padding:8px 8px 9px;min-width:0}
+.box .bl{font-weight:800;font-size:13.5px;border-bottom:2px solid var(--rule);padding-bottom:3px}
+.box .bv{font-size:21px;font-weight:800;margin-top:5px;overflow-wrap:anywhere;line-height:1.15}
+.box .bf{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.25}
+.box.hero{border-color:var(--c-20);box-shadow:inset 0 5px 0 var(--c-20)}
+
+.shiftpick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.shiftpick button{background:var(--sheet);border:2px solid var(--hair);border-radius:6px;padding:14px;text-align:left;min-height:84px}
+.shiftpick .k{display:block;font-size:28px;font-weight:800}
+.shiftpick .v{display:block;font-size:14px;color:var(--muted)}
+.shiftpick button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+
+h1{font-size:25px;line-height:1.15;margin:12px 2px 2px;font-weight:800;letter-spacing:-.015em}
+.sub{color:var(--muted);font-size:15px;margin:4px 2px 0}
+.sechead{margin:26px 2px 0;font-size:18px;font-weight:800}
+.subline{margin:3px 2px 0;font-size:14.5px;color:var(--muted)}
+
+.note{margin-top:10px;border-radius:6px;padding:10px 12px;font-size:14.5px;line-height:1.45}
+.note.warn{background:var(--bad-bg);color:var(--bad)}
+.note.ok{background:var(--good-bg);color:var(--good)}
+.note.info{background:var(--sheet);color:var(--muted);border:1px solid var(--hair)}
+.note b{font-weight:800}
+.fillbtn{width:100%;margin-top:10px;min-height:46px;border-radius:6px;border:2px dashed var(--rule);font-weight:700;font-size:15px}
+
+/* tool buttons beside a table title */
+.tool{white-space:nowrap;flex:none;min-width:44px;height:44px;padding:0 10px;border-radius:6px;display:inline-flex;align-items:center;gap:6px;border:2px solid var(--rule);font-weight:700;font-size:14px}
+.tool:active{background:var(--shade)}
+.tool[disabled]{opacity:.45}
+.scanbox{margin:0 0 10px;border:2px solid var(--rule);border-radius:6px;padding:10px}
+.scanbox label{display:block;font-weight:700;font-size:14.5px;margin-bottom:4px}
+.scanbox .help{font-size:13.5px;color:var(--muted);margin:0 0 8px}
+.scanbox textarea{width:100%;min-height:96px;border:1px solid var(--rule);border-radius:4px;background:var(--ground);padding:8px;font-size:16px;resize:vertical}
+.scanbox .row{display:flex;gap:8px;margin-top:8px}
+.scanstat{font-size:14px;line-height:1.45;margin:0 0 10px;padding:9px 11px;border-radius:6px;background:var(--shade);color:var(--muted)}
+.scanstat.ok{background:var(--good-bg);color:var(--good)}
+.scanstat.warn{background:var(--bad-bg);color:var(--bad)}
+.scanstat b{font-weight:800}
+.scanstat button{margin-top:6px;display:block;font-weight:700;text-decoration:underline;text-underline-offset:3px;min-height:32px}
+
+.keybox{margin-top:14px;background:var(--sheet);border:1px solid var(--hair);border-radius:6px;padding:0 12px}
+.keybox summary{min-height:48px;display:flex;align-items:center;font-weight:700;cursor:pointer}
+.keybox p{font-size:14px;color:var(--muted);margin:0 0 8px}
+.keybox input{width:100%;height:46px;border:1px solid var(--rule);border-radius:4px;background:var(--ground);padding:0 10px;font-size:16px}
+.keybox .row{display:flex;gap:8px;margin:8px 0 12px}
+
+/* trade lists and the bag: one strap per denomination */
+.shortlist,.trade{margin-top:10px;background:var(--sheet);border:1px solid var(--hair);border-radius:6px;overflow:hidden}
+.sl,.trade li{display:flex;align-items:center;gap:12px;padding:8px 12px 8px 0;border-bottom:1px solid var(--hair)}
+.sl:last-child,.trade li:last-child{border-bottom:0}
+.tag{flex:none;width:84px;min-height:40px;display:flex;align-items:center;padding:0 10px;font-weight:800;font-size:15.5px;background:var(--bc);color:var(--bt)}
+.sl .k{flex:1;min-width:0}
+.sl .nm{font-weight:700;font-size:16px}
+.sl .v{text-align:right;flex:none}
+.sl .big{font-weight:800;font-size:16px}
+.sl.bad .big{color:var(--bad)}
+.sl .meta{font-size:13px;color:var(--muted)}
+.trade h3{margin:0;padding:10px 12px;font-size:15px;font-weight:800;background:var(--shade);border-bottom:1px solid var(--hair)}
+.trade ul{list-style:none;margin:0;padding:0}
+.trade li .n{font-weight:800;min-width:40px;font-size:18px}
+.trade li .d{flex:1;font-size:15px;color:var(--muted)}
+.trade li .v{font-size:15px;font-weight:600}
+.trade .foot{padding:9px 12px;font-size:14.5px;font-weight:800;border-top:2px solid var(--rule)}
+.trade .empty{padding:12px;color:var(--muted);font-size:15px}
+
+.toggle{display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px 12px;background:var(--sheet);border:1px solid var(--hair);border-radius:6px;min-height:48px}
+.toggle input{width:22px;height:22px;flex:none;accent-color:var(--c-20)}
+.toggle span{font-size:14.5px;line-height:1.35}
+.wide{width:100%;min-height:48px;border-radius:6px;font-weight:700;font-size:15.5px;margin-top:10px;border:2px solid var(--rule)}
+.wide[disabled]{opacity:.5}
+.aiout{margin-top:10px;font-size:15px;line-height:1.5}
+.aiout .hd{font-weight:800}
+.aiout ul{margin:6px 0 0;padding-left:18px}
+
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--ground);border-top:1px solid var(--hair);padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px))}
+.barin{max-width:560px;margin:0 auto;display:flex;gap:10px}
+.btn{height:56px;border-radius:8px;font-weight:800;font-size:17px;flex:1}
+.btn.ghost{flex:0 0 96px;background:var(--sheet);color:var(--ink);border:2px solid var(--hair)}
+.btn.go{background:var(--ink);color:var(--ground)}
+.btn.go:active{opacity:.85}
+.btn[disabled]{opacity:.35;cursor:not-allowed}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brandline">
+      <div class="brand">Till &amp; Petty</div>
+      <div class="chip" id="chip">no shift</div>
+    </div>
+    <div class="track" id="track"></div>
+    <div class="stepname" id="stepname"></div>
+  </header>
+  <main id="main"></main>
+</div>
+<div class="bar"><div class="barin" id="bar"></div></div>
+
+<script>
+"use strict";
+/* ============ denominations & par ============ */
+const D = [
+  {k:"b100",c:10000, nm:"$100",     par:0,  coin:false, col:"var(--c-100)", w:170},
+  {k:"b50", c:5000,  nm:"$50",      par:0,  coin:false, col:"var(--c-50)",  w:80},
+  {k:"b20", c:2000,  nm:"$20",      par:5,  coin:false, col:"var(--c-20)",  w:27},
+  {k:"b10", c:1000,  nm:"$10",      par:10, coin:false, col:"var(--c-10)",  w:13},
+  {k:"b5",  c:500,   nm:"$5",       par:25, coin:false, col:"var(--c-5)",   w:6},
+  {k:"b1",  c:100,   nm:"$1",       par:75, coin:false, col:"var(--c-1)",   w:1},
+  {k:"q",   c:25,    nm:"Quarters", par:40, coin:true,  col:"var(--c-q)",   w:400},
+  {k:"d",   c:10,    nm:"Dimes",    par:50, coin:true,  col:"var(--c-d)",   w:800},
+  {k:"n",   c:5,     nm:"Nickels",  par:40, coin:true,  col:"var(--c-n)",   w:1200},
+  {k:"p",   c:1,     nm:"Pennies",  par:50, coin:true,  col:"var(--c-p)",   w:2500}
+];
+const BYK = Object.fromEntries(D.map(d=>[d.k,d]));
+const PAR = Object.fromEntries(D.map(d=>[d.k,d.par]));
+const PAR_TOTAL = D.reduce((s,d)=>s+d.par*d.c,0); // 41750
+
+const money = c => (c<0?"-":"") + "$" + (Math.abs(c)/100).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const zero  = () => Object.fromEntries(D.map(d=>[d.k,0]));
+const total = m => D.reduce((s,d)=>s+(m[d.k]||0)*d.c,0);
+const clone = m => Object.assign({},m);
+
+/* ============ exact-change solver (bounded knapsack, binary split) ============
+   Finds a multiset from `pool` summing to exactly `target` cents, minimising a
+   weight that strongly favours small BILLS and treats coins as last resort. */
+function exactChange(pool, target){
+  if(target === 0) return {};
+  if(target < 0) return null;
+  const poolTotal = D.reduce((s,d)=>s+(pool[d.k]||0)*d.c,0);
+  if(target > poolTotal) return null;
+  if(target > 120000) return null; // sanity guard
+
+  const items = [];
+  for(const d of D){
+    let n = Math.min(pool[d.k]||0, Math.floor(target/d.c));
+    let k = 1;
+    while(n > 0){
+      const take = Math.min(k, n);
+      items.push({key:d.k, cents:d.c*take, w:d.w*take, take});
+      n -= take; k *= 2;
+    }
+  }
+  const INF = Infinity;
+  const dp = new Float64Array(target+1).fill(INF); dp[0] = 0;
+  const pick = items.map(()=>new Uint8Array(target+1));
+  for(let i=0;i<items.length;i++){
+    const it = items[i], row = pick[i];
+    for(let v=target; v>=it.cents; v--){
+      const prev = dp[v-it.cents];
+      if(prev !== INF && prev + it.w < dp[v]){ dp[v] = prev + it.w; row[v] = 1; }
+    }
+  }
+  if(dp[target] === INF) return null;
+  const out = zero(); let v = target;
+  for(let i=items.length-1;i>=0;i--){
+    if(pick[i][v]){ out[items[i].key] += items[i].take; v -= items[i].cents; }
+  }
+  const res = {};
+  for(const d of D) if(out[d.k]>0) res[d.k] = out[d.k];
+  return res;
+}
+
+/* smallest reachable amount >= target, from pool — one boolean subset-sum pass */
+function nearestReachable(pool, target){
+  const poolTotal = D.reduce((s,d)=>s+(pool[d.k]||0)*d.c,0);
+  const cap = Math.min(poolTotal, target + 2000);
+  if(cap < target) return null;
+  const ok = new Uint8Array(cap+1); ok[0] = 1;
+  for(const d of D){
+    let n = Math.min(pool[d.k]||0, Math.floor(cap/d.c)), k = 1;
+    while(n > 0){
+      const take = Math.min(k, n), step = d.c*take;
+      for(let v=cap; v>=step; v--) if(ok[v-step]) ok[v] = 1;
+      n -= take; k *= 2;
+    }
+  }
+  for(let v=target; v<=cap; v++) if(ok[v]) return v;
+  return null;
+}
+
+/* ============ the plan ============ */
+function buildPlan(till, petty, pushBig){
+  const need = {}, hardShort = {};
+  for(const d of D){
+    const miss = Math.max(0, PAR[d.k] - (till[d.k]||0));
+    if(miss > 0){
+      const have = petty[d.k]||0;
+      need[d.k] = Math.min(miss, have);
+      if(have < miss) hardShort[d.k] = miss - have;
+    }
+  }
+  const give = clone(zero());
+  for(const k in need) give[k] = need[k];
+
+  // pool the drawer can pay back from = anything above par, excluding what we're receiving
+  const poolOf = g => {
+    const p = zero();
+    for(const d of D){
+      if((g[d.k]||0) > 0) continue;
+      p[d.k] = Math.max(0, (till[d.k]||0) - PAR[d.k]);
+    }
+    return p;
+  };
+
+  let V = total(give);
+  let pool = poolOf(give);
+  let back = exactChange(pool, V);
+  const notes = [];
+
+  if(!back && V > 0){
+    const Vp = nearestReachable(pool, V);
+    if(Vp !== null && Vp > V){
+      const gap = Vp - V;
+      // petty tops up with denominations the drawer can't pay back in
+      const spare = zero();
+      for(const d of D){
+        if(pool[d.k] > 0) continue;
+        spare[d.k] = Math.max(0, (petty[d.k]||0) - (give[d.k]||0));
+      }
+      const top = exactChange(spare, gap);
+      if(top){
+        for(const k in top) give[k] += top[k];
+        V = total(give); pool = poolOf(give); back = exactChange(pool, V);
+        notes.push("Petty had to hand over a little extra so the swap came out even — the surplus above par goes into the deposit.");
+      }
+    }
+  }
+
+  let impossible = (V > 0 && !back);
+  let wanted = null;
+  if(impossible){
+    // No even swap exists. Do NOT half-apply it — report the blocker and move nothing.
+    wanted = {map:clone(give), value:V};
+    for(const d of D) give[d.k] = 0;
+    back = {}; V = 0;
+  }
+
+  // optional: push $50 / $100 out of petty into the drawer (and on to the deposit)
+  const pushes = [];
+  if(pushBig && !impossible){
+    let rem = zero();
+    for(const d of D) rem[d.k] = Math.max(0, (pool[d.k]||0) - ((back&&back[d.k])||0));
+    for(const big of ["b100","b50"]){
+      let avail = Math.max(0,(petty[big]||0) - (give[big]||0));
+      while(avail > 0){
+        const smalls = zero();
+        for(const d of D){ if(d.coin||d.k==="b50"||d.k==="b100") continue; smalls[d.k] = rem[d.k]; }
+        const s = exactChange(smalls, BYK[big].c);
+        if(!s) break;
+        pushes.push({big, smalls:s});
+        give[big] = (give[big]||0) + 1;
+        for(const k in s){ rem[k] -= s[k]; back = back||{}; back[k] = (back[k]||0) + s[k]; }
+        avail--;
+      }
+    }
+  }
+
+  back = back || {};
+  const tillAfter = zero();
+  for(const d of D) tillAfter[d.k] = (till[d.k]||0) + (give[d.k]||0) - (back[d.k]||0);
+
+  // What the drawer keeps toward par, and what is left over for the bag.
+  const keep = zero(), surplus = zero();
+  for(const d of D){
+    keep[d.k] = Math.min(tillAfter[d.k], PAR[d.k]);
+    surplus[d.k] = tillAfter[d.k] - keep[d.k];
+  }
+  // Par mix unreachable (petty didn't hold the bill). Make the float whole by
+  // VALUE using the smallest surplus the drawer already has, instead of
+  // closing $417.50 short.
+  const parGap = PAR_TOTAL - total(keep);
+  let makeup = {}, makeupShort = 0;
+  if(parGap > 0){
+    const mk = exactChange(surplus, parGap);
+    if(mk){ makeup = mk; for(const k in mk){ keep[k] += mk[k]; surplus[k] -= mk[k]; } }
+    else makeupShort = parGap;
+  }
+
+  const deposit = surplus;
+  const pettyAfter = zero();
+  for(const d of D) pettyAfter[d.k] = (petty[d.k]||0) - (give[d.k]||0) + (back[d.k]||0);
+
+  // Per-denomination shortfall report: counted, par, and where the fix came from.
+  const shortList = D.filter(d => d.par > 0 && (till[d.k]||0) < d.par).map(d => {
+    const miss = d.par - (till[d.k]||0);
+    const got = Math.min(give[d.k]||0, miss);
+    return {k:d.k, nm:d.nm, col:d.col, counted:(till[d.k]||0), par:d.par, miss, got, left:miss-got};
+  });
+
+  return {
+    give, back, pushes, notes, hardShort, impossible, wanted, shortList,
+    swapValue: total(give),
+    tillAfter, deposit, pettyAfter,
+    drawerFinal: keep, drawerFinalTotal: total(keep),
+    makeup, makeupValue: total(makeup), makeupShort, parGap,
+    pettyDelta: total(pettyAfter) - total(petty),
+    depositTotal: total(deposit),
+    depositCheck: total(deposit) - (total(till) - PAR_TOTAL),
+    belowPar: D.filter(d => keep[d.k] < PAR[d.k]).map(d=>d.k)
+  };
+}
+
+
+
+/* ============ helpers ============ */
+const num = c => (c<0?"-":"") + (Math.abs(c)/100).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const cents = s => { if(s===""||s==null) return 0; const v = parseFloat(String(s).replace(/[^0-9.\-]/g,"")); return isNaN(v)?0:Math.round(v*100); };
+const intv = s => { const v = parseInt(String(s).replace(/[^0-9]/g,""),10); return isNaN(v)?0:v; };
+const has = s => s !== "" && s != null;
+const todayStr = () => new Date().toLocaleDateString("en-US",{month:"numeric",day:"numeric",year:"2-digit"});
+const DENOM_LABEL = {b100:"100.00",b50:"50.00",b20:"20.00",b10:"10.00",b5:"5.00",b1:"1.00",q:"0.25",d:"0.10",n:"0.05",p:"0.01"};
+
+const el = (t,a,kids) => {
+  const n = document.createElement(t);
+  if(a) for(const k in a){
+    const v = a[k];
+    if(v === null || v === undefined || v === false) continue;
+    if(k==="class") n.className = v;
+    else if(k==="html") n.innerHTML = v;
+    else if(k==="text") n.textContent = v;
+    else if(k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v);
+  }
+  if(kids) for(const c of [].concat(kids)) if(c) n.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+  return n;
+};
+
+/* ============ state ============ */
+const LS = "till-petty-v2";
+let S = {
+  step:0, shift:null, name:"", date:todayStr(),
+  petty:zero(), till:zero(),
+  gift:"", disc:"",
+  ccCount:"", ccAmount:"",
+  am:{ccCount:"", ccTotal:"", net:"", deposit:""},
+  pos:{expected:"", net:""},
+  pushBig:true
+};
+let SAVED = {};
+function load(){
+  try{
+    SAVED = JSON.parse(localStorage.getItem(LS)||"null") || {};
+    if(!SAVED.petty){
+      const old = JSON.parse(localStorage.getItem("till-petty-v1")||"null");
+      if(old && old.petty) SAVED.petty = old.petty;
+    }
+  }catch(e){ SAVED = {}; }
+  if(SAVED.petty) S.petty = Object.assign(zero(), SAVED.petty);
+  if(SAVED.name) S.name = SAVED.name;
+}
+function persist(){
+  try{ localStorage.setItem(LS, JSON.stringify(SAVED)); }catch(e){}
+}
+load();
+
+/* ============ the numbers (exactly the paper chart) ============ */
+function figures(){
+  const cash = total(S.till);
+  const pm = S.shift === "PM";
+  const machineCount = intv(S.ccCount), machineCC = cents(S.ccAmount);
+  const amCount = intv(S.am.ccCount), amCC = cents(S.am.ccTotal);
+  const ccCount = pm ? machineCount - amCount : machineCount;
+  const cc = pm ? machineCC - amCC : machineCC;
+  const tot = cash + cc;
+  const net = tot - PAR_TOTAL;
+  const deposit = cash - PAR_TOTAL;
+  const amNet = cents(S.am.net), amDep = cents(S.am.deposit);
+  const grand = pm ? amNet + net : null;
+
+  let expected = null, overShort = null;
+  if(has(S.pos.expected)){
+    expected = pm ? cents(S.pos.expected) - amDep : cents(S.pos.expected);
+    overShort = cash - expected;
+  }
+  let posNet = null, posNetDiff = null;
+  if(has(S.pos.net)){
+    posNet = cents(S.pos.net);
+    posNetDiff = (pm ? grand : net) - posNet;
+  }
+  return {cash, ccCount, cc, machineCount, machineCC, amCount, amCC, tot, net, deposit, amNet, amDep, grand,
+          expected, overShort, posNet, posNetDiff,
+          ccBad: pm && has(S.ccAmount) && (machineCC < amCC || machineCount < amCount)};
+}
+
+/* ============ inputs ============ */
+function moneyIn(get, set, opts){
+  opts = opts||{};
+  const i = el("input",{class:"cellin "+(opts.align||"r"),inputmode:"decimal",placeholder:opts.ph||"0.00","aria-label":opts.label||""});
+  i.value = get();
+  i.addEventListener("input",()=>{
+    let v = i.value.replace(/[^0-9.]/g,"");
+    const p = v.split("."); if(p.length>2) v = p[0]+"."+p.slice(1).join("");
+    if(v !== i.value) i.value = v;
+    set(v); if(opts.onchange) opts.onchange();
+  });
+  i.addEventListener("focus",()=>i.select());
+  return i;
+}
+function countIn(get, set, opts){
+  opts = opts||{};
+  const i = el("input",{class:"cellin c",inputmode:"numeric",pattern:"[0-9]*",placeholder:opts.ph||"#","aria-label":opts.label||""});
+  i.value = get();
+  i.addEventListener("input",()=>{
+    const v = i.value.replace(/[^0-9]/g,""); if(v!==i.value) i.value = v;
+    set(v); if(opts.onchange) opts.onchange();
+  });
+  i.addEventListener("focus",()=>i.select());
+  return i;
+}
+
+/* ============ reading the paper sheet ============ */
+// Gemini key lives only in this phone's localStorage; it is never in the page source.
+const GEMINI_KEY = "till-gemini-key";
+const MODEL_FAST = "gemini-3.5-flash-lite", MODEL_CAREFUL = "gemini-3.5-flash";
+const getKey = () => { try{ return localStorage.getItem(GEMINI_KEY) || ""; }catch(e){ return ""; } };
+const scanInfo = {};      // section -> {flags:{k:"unsure"|"mismatch"}, cls, html, file, title, open}
+const ICON = {
+  cam:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>',
+  text:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2"/><path d="M8 9h8M8 12h8M8 15h5"/></svg>',
+  minus:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12"/></svg>',
+  plus:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 12h12M12 6v12"/></svg>'
+};
+
+/* Pasted Live Text -> counts. Two shapes work:
+   whole rows ("20.00 5 100") are matched by their printed label;
+   the Count column alone is read top ($100) to bottom (pennies). */
+const LABEL_VAL = {b100:100,b50:50,b20:20,b10:10,b5:5,b1:1,q:.25,d:.10,n:.05,p:.01};
+function parsePasted(text){
+  const clean = String(text||"").replace(/(\d),(?=\d{3}\b)/g,"$1").replace(/\b[Oo]\b|(?<=\d)[Oo]|[Oo](?=\d)/g,"0").replace(/[lI|](?=\d)|(?<=\d)[lI|]/g,"1");
+  const lines = clean.split(/\r?\n/).map(l => l.match(/\d+(?:\.\d+)?|\.\d+/g) || []).filter(t => t.length);
+  const counts = {}, totals = {}, flags = {};
+  const labelOf = tok => tok.includes(".") ? D.find(d => Math.abs(LABEL_VAL[d.k] - parseFloat(tok)) < 1e-9) : null;
+  const rowLines = lines.filter(t => labelOf(t[0]));
+  if(rowLines.length >= 3){
+    for(const t of rowLines){
+      const d = labelOf(t[0]);
+      const c = t[1] && !t[1].includes(".") ? parseInt(t[1],10) : 0;
+      counts[d.k] = c;
+      if(t[2] !== undefined) totals[d.k] = Math.round(parseFloat(t[2])*100);
+    }
+    for(const d of D) if(!(d.k in counts)){ counts[d.k] = 0; flags[d.k] = "unsure"; }
+    return {counts, totals, flags, mode:"rows"};
+  }
+  const ints = lines.flat().filter(t => !t.includes(".")).map(t => parseInt(t,10));
+  if(!ints.length) return {error:"No numbers found. Scan or paste the Count column."};
+  if(ints.length > 10) return {error:"Found "+ints.length+" numbers, expected 10. Select only the Count column, or the whole rows including the $ labels."};
+  const pad = 10 - ints.length;           // blank rows on paper are usually $100 / $50 at the top
+  D.forEach((d,i) => { if(i < pad){ counts[d.k] = 0; flags[d.k] = "unsure"; } else counts[d.k] = ints[i-pad]; });
+  return {counts, totals, flags, mode:"column", padded:pad};
+}
+
+/* one place that writes a reading into the table and explains it */
+function applyReading(key, map, counts, totals, flags, okMsg){
+  const info = scanInfo[key] = scanInfo[key] || {};
+  info.flags = Object.assign({}, flags);
+  const mism = [];
+  for(const d of D){
+    const v = Number(counts[d.k]);
+    if(!isFinite(v) || v < 0){ info.flags[d.k] = "unsure"; continue; }
+    map[d.k] = Math.round(v);
+    const w = totals[d.k];
+    if(w !== undefined && w !== null && isFinite(w) && w !== map[d.k]*d.c){
+      info.flags[d.k] = "mismatch";
+      mism.push(d.nm+": paper says $"+num(w)+", but "+map[d.k]+" × "+d.nm+" is $"+num(map[d.k]*d.c));
+    }
+  }
+  const nUnsure = Object.values(info.flags).filter(x => x === "unsure").length;
+  if(mism.length){ info.cls = "warn"; info.html = "<b>The paper's math is off on "+mism.length+" row"+(mism.length>1?"s":"")+".</b> Counts are filled in and the totals here are right.<br>"+mism.join("<br>"); }
+  else if(nUnsure){ info.cls = "warn"; info.html = "<b>Check the highlighted row"+(nUnsure>1?"s":"")+".</b> "+okMsg; }
+  else { info.cls = "ok"; info.html = "<b>Filled in.</b> Glance down the Count column against the paper before you continue."; }
+  if(map === S.petty){ SAVED.petty = S.petty; persist(); }
+}
+
+async function toJpegB64(file){
+  const url = URL.createObjectURL(file);
+  try{
+    const img = await new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => bad(new Error("decode")); i.src = url; });
+    const s = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement("canvas");
+    c.width = Math.round(img.naturalWidth*s); c.height = Math.round(img.naturalHeight*s);
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    return c.toDataURL("image/jpeg", 0.85).split(",")[1];
+  } finally { URL.revokeObjectURL(url); }
+}
+async function gemini(model, prompt, file){
+  const key = getKey();
+  if(!key) throw {code:"no_key"};
+  const parts = [{text:prompt}];
+  if(file) parts.push({inline_data:{mime_type:"image/jpeg", data: await toJpegB64(file)}});
+  let r;
+  try{
+    r = await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+model+":generateContent", {
+      method:"POST", headers:{"Content-Type":"application/json","x-goog-api-key":key},
+      body: JSON.stringify({contents:[{role:"user",parts}], generationConfig:{responseMimeType:"application/json", temperature:0}})
+    });
+  }catch(e){ throw {code:"offline"}; }
+  if(!r.ok){
+    const t = await r.text().catch(() => "");
+    throw {code: r.status === 429 ? "rate_limited" : (r.status === 400 && /key/i.test(t)) || r.status === 401 || r.status === 403 ? "bad_key" : r.status === 404 ? "no_model" : "http", message:t};
+  }
+  const j = await r.json();
+  const txt = ((j.candidates||[])[0]?.content?.parts||[]).map(p => p.text||"").join("");
+  const a = txt.indexOf("{"), b = txt.lastIndexOf("}");
+  if(a < 0 || b < a) throw {code:"invalid_json"};
+  return JSON.parse(txt.slice(a, b+1));
+}
+const geminiError = e => {
+  const c = e && e.code;
+  return c === "no_key" ? "Add your Gemini key on the first screen to use the camera."
+    : c === "bad_key" ? "<b>Gemini refused the key.</b> Check it on the first screen. If you restricted it to a website, add this page's address."
+    : c === "no_model" ? "<b>That Gemini model isn't available</b> to your key."
+    : c === "rate_limited" ? "Too many requests just now. Give it a minute."
+    : c === "offline" ? "<b>No connection.</b> Use Scan Text instead; it works offline."
+    : c === "invalid_json" ? "The reply came back unreadable. Try again with the table flat and well lit."
+    : "The photo didn't come back. Try again, or use Scan Text.";
+};
+
+function scanPrompt(title){
+  return [
+"This photo shows a paper cash-count sheet from a retail store. The photo may be rotated sideways or upside down, and the page may hold several similar tables.",
+'Find the table titled "'+title+'" and ignore every other table on the page.',
+"Its rows are denominations, top to bottom: 100.00, 50.00, 20.00, 10.00, 5.00, 1.00, 0.25, 0.10, 0.05, 0.01. Each row has a handwritten Count (how many bills or coins) and a handwritten Total (dollar value).",
+"Read the Count column for every row. Also read the Total column, but only so it can be cross-checked; never work a count out from a total.",
+"A blank Count is 0. If a digit is unclear or crossed out, give your best reading and list that row in unsure.",
+'Reply with ONLY a JSON object: {"found":true,"counts":{"100.00":0,"50.00":0,"20.00":5,"10.00":10,"5.00":25,"1.00":75,"0.25":40,"0.10":50,"0.05":40,"0.01":50},"totals":{"100.00":null,"50.00":null,"20.00":100,"10.00":100,"5.00":125,"1.00":75,"0.25":10,"0.10":5,"0.05":2,"0.01":0.5},"unsure":[]}',
+'Use null for a Total that is blank. If you cannot find that table at all, reply {"found":false}.'
+  ].join("\n");
+}
+async function runPhoto(key, map, title, file, careful){
+  const info = scanInfo[key] = scanInfo[key] || {};
+  Object.assign(info, {file, title, flags:{}, cls:"", retry:false, html: careful ? "Reading again with the careful model…" : "Reading the Count column…"});
+  render();
+  try{
+    const r = await gemini(careful ? MODEL_CAREFUL : MODEL_FAST, scanPrompt(title), file);
+    if(!r || r.found === false || !r.counts){
+      info.cls = "warn"; info.html = "<b>Couldn't find “"+title+"”</b> in that photo. Get the whole table in frame and try again.";
+    } else {
+      const counts = {}, totals = {}, flags = {};
+      const unsure = new Set((Array.isArray(r.unsure) ? r.unsure : []).map(String));
+      for(const d of D){
+        const lbl = DENOM_LABEL[d.k], v = r.counts[lbl];
+        counts[d.k] = (v === null || v === undefined || v === "") ? 0 : Number(v);
+        if(unsure.has(lbl)) flags[d.k] = "unsure";
+        const w = r.totals ? r.totals[lbl] : null;
+        if(w !== null && w !== undefined && w !== "" && isFinite(Number(w))) totals[d.k] = Math.round(Number(w)*100);
+      }
+      applyReading(key, map, counts, totals, flags, "The handwriting was unclear there.");
+      info.retry = !careful;
+    }
+  }catch(e){ info.cls = "warn"; info.html = geminiError(e); }
+  render();
+}
+
+function scanHeader(key, map, title){
+  const info = scanInfo[key] = scanInfo[key] || {};
+  const wrap = document.createDocumentFragment();
+  const tools = el("div",{class:"tools"});
+  const textBtn = el("button",{class:"tool",type:"button","aria-expanded":String(!!info.open),html:ICON.text+"<span>Scan text</span>",
+    onclick:()=>{ info.open = !info.open; render(); if(info.open){ const ta = document.getElementById("scan-"+key); if(ta) ta.focus(); } }});
+  tools.appendChild(textBtn);
+  if(getKey()){
+    const picker = el("input",{type:"file",accept:"image/*",capture:"environment",hidden:"",tabindex:"-1"});
+    picker.addEventListener("change",()=>{ const f = picker.files && picker.files[0]; picker.value = ""; if(f) runPhoto(key, map, title, f, false); });
+    tools.appendChild(el("button",{class:"tool",type:"button","aria-label":"Read counts from a photo with Gemini",html:ICON.cam,onclick:()=>picker.click()}));
+    tools.appendChild(picker);
+  }
+  wrap.appendChild(el("div",{class:"titlerow"},[el("div",{class:"ptitle",text:title}), tools]));
+  if(info.open){
+    const ta = el("textarea",{id:"scan-"+key,rows:"5",autocomplete:"off",autocorrect:"off",spellcheck:"false",inputmode:"text"});
+    ta.value = info.draft || "";
+    ta.addEventListener("input",()=>{ info.draft = ta.value; });
+    const err = el("p",{class:"help",role:"status"});
+    wrap.appendChild(el("div",{class:"scanbox"},[
+      el("label",{for:"scan-"+key,text:"Count column from the paper"}),
+      el("p",{class:"help",text:"Tap the box, tap it again, and choose Scan Text. Point the camera at the Count column of “"+title+"” and tap Insert. Whole rows with the $ labels work too."}),
+      ta, err,
+      el("div",{class:"row"},[
+        el("button",{class:"wide",type:"button",style:"margin-top:0;background:var(--ink);color:var(--ground);border-color:var(--ink)",text:"Fill the table",onclick:()=>{
+          const p = parsePasted(ta.value);
+          if(p.error){ err.textContent = p.error; return; }
+          applyReading(key, map, p.counts, p.totals, p.flags, p.padded ? "Only "+(10-p.padded)+" numbers came through, so the top "+p.padded+" row"+(p.padded>1?"s were":" was")+" set to 0." : "Those rows weren't in what you scanned.");
+          info.open = false; info.draft = ""; render();
+        }}),
+        el("button",{class:"wide",type:"button",style:"margin-top:0;flex:0 0 96px",text:"Cancel",onclick:()=>{ info.open = false; render(); }})
+      ])
+    ]));
+  }
+  if(info.html){
+    const st = el("div",{class:"scanstat "+(info.cls||""),role:"status",html:info.html});
+    if(info.retry && info.file) st.appendChild(el("button",{type:"button",text:"Read it again more carefully",onclick:()=>runPhoto(key,map,info.title,info.file,true)}));
+    wrap.appendChild(st);
+  }
+  return wrap;
+}
+function clearFlag(key, k){
+  const info = scanInfo[key];
+  if(info && info.flags && info.flags[k]){ delete info.flags[k]; return true; }
+  return false;
+}
+
+/* ============ the chart table ============ */
+function sheetTable(){
+  const t = el("table",{class:"sheet"});
+  t.appendChild(el("colgroup",{},[el("col",{class:"c1"}),el("col",{class:"c2"}),el("col",{class:"c3"})]));
+  t.appendChild(el("thead",{},el("tr",{},[el("th"),el("th",{text:"Count"}),el("th",{text:"Total"})])));
+  const tb = el("tbody"); t.appendChild(tb);
+  return {t, tb};
+}
+function dnCell(d, parNode){
+  return el("td",{class:"dn"},el("div",{class:"band k-"+d.k},[
+    el("div",{class:"dl"},[el("small",{text:"$"}), DENOM_LABEL[d.k]]),
+    parNode
+  ]));
+}
+const tag = d => el("span",{class:"tag k-"+d.k,text:d.nm});
+function stepper(map, d, onchange){
+  const inp = el("input",{inputmode:"numeric",pattern:"[0-9]*","aria-label":d.nm+" count",value:String(map[d.k]||0)});
+  const set = v => { map[d.k] = Math.max(0, Math.min(99999, v|0)); if(document.activeElement!==inp) inp.value = String(map[d.k]); onchange(); };
+  inp.addEventListener("input",()=>{ const v = parseInt(inp.value.replace(/[^0-9]/g,""),10); map[d.k] = isNaN(v)?0:Math.min(99999,v); onchange(); });
+  inp.addEventListener("blur",()=>{ inp.value = String(map[d.k]||0); });
+  inp.addEventListener("focus",()=>inp.select());
+  const mk = delta => {
+    const b = el("button",{type:"button","aria-label":(delta>0?"add ":"remove ")+d.nm,html:delta>0?ICON.plus:ICON.minus});
+    let t1=null,t2=null; const stop=()=>{clearTimeout(t1);clearInterval(t2);t1=t2=null;};
+    b.addEventListener("pointerdown",ev=>{ ev.preventDefault(); set((map[d.k]||0)+delta);
+      t1=setTimeout(()=>{t2=setInterval(()=>set((map[d.k]||0)+delta),55);},420); });
+    ["pointerup","pointerleave","pointercancel"].forEach(e=>b.addEventListener(e,stop));
+    return b;
+  };
+  return el("div",{class:"step"},[mk(-1),inp,mk(1)]);
+}
+
+/* editable denomination rows + Cash Total. returns {table, tbody, refresh} */
+function countTable(map, opts){
+  opts = opts||{};
+  const {t, tb} = sheetTable();
+  const painters = [];
+  const sumCell = el("td",{class:"tt"});
+  const refresh = () => {
+    painters.forEach(p=>p());
+    sumCell.textContent = num(total(map));
+    if(opts.onchange) opts.onchange();
+  };
+  for(const d of D){
+    const par = el("div",{class:"par"});
+    const tot = el("td",{class:"tt"});
+    const tr = el("tr");
+    const paint = () => {
+      const n = map[d.k]||0;
+      tot.textContent = n ? num(n*d.c) : "";
+      const flag = opts.scanKey && scanInfo[opts.scanKey] && scanInfo[opts.scanKey].flags ? scanInfo[opts.scanKey].flags[d.k] : null;
+      tr.className = flag ? "flag" : "";
+      if(flag){ par.className = "par flag"; par.textContent = flag==="mismatch" ? "total off" : "check this"; return; }
+      if(opts.showPar){
+        if(!d.par){ par.className="par"; par.textContent=""; }
+        else {
+          const diff = n - d.par;
+          if(diff<0){ par.className="par short"; par.textContent = (-diff)+" short of "+d.par; }
+          else if(diff>0){ par.className="par over"; par.textContent = "+"+diff+" over "+d.par; }
+          else { par.className="par"; par.textContent = "at par "+d.par; }
+        }
+      }
+    };
+    painters.push(paint);
+    tr.appendChild(dnCell(d,par)); tr.appendChild(el("td",{},stepper(map,d,()=>{ if(opts.scanKey) clearFlag(opts.scanKey,d.k); refresh(); })));
+    tr.appendChild(tot);
+    tb.appendChild(tr);
+  }
+  tb.appendChild(el("tr",{class:"sum"},[el("td",{class:"lb",text:"Cash Total"}), el("td"), sumCell]));
+  painters.forEach(p=>p());
+  sumCell.textContent = num(total(map));
+  return {table:t, tbody:tb, refresh};
+}
+
+/* read-only denomination rows */
+function staticTable(map, opts){
+  opts = opts||{};
+  const {t, tb} = sheetTable();
+  for(const d of D){
+    const n = map[d.k]||0;
+    tb.appendChild(el("tr",{},[
+      dnCell(d, el("div",{class:"par"})),
+      el("td",{class:"ctr",text:n?String(n):""}),
+      el("td",{class:"tt",text:n?num(n*d.c):""})
+    ]));
+  }
+  tb.appendChild(el("tr",{class:"sum"},[el("td",{class:"lb",text:"Cash Total"}), el("td"), el("td",{class:"tt",text:num(total(map))})]));
+  return {table:t, tbody:tb};
+}
+
+function boxes(f, live){
+  const pm = S.shift === "PM";
+  const wrap = el("div",{class:"boxes"+(pm?"":" two")});
+  const box = (label, val, formula, hero) => el("div",{class:"box"+(hero?" hero":"")},[
+    el("div",{class:"bl",text:label}), el("div",{class:"bv",text:val}), el("div",{class:"bf",text:formula})
+  ]);
+  wrap.appendChild(box("Net Sales", num(f.net), "Total − 417.50", !pm));
+  if(pm) wrap.appendChild(box("Grand Total", num(f.grand), "AM Net + PM Net", true));
+  wrap.appendChild(box("Deposit Total", num(f.deposit), (pm?"PM ":"")+"Cash − 417.50"));
+  return wrap;
+}
+
+/* ============ screens ============ */
+const STEPS = ["Opening","Petty cash","Closing register","Result"];
+
+function carryToday(){
+  return SAVED.carry && SAVED.carry.date === todayStr() ? SAVED.carry : null;
+}
+
+function screenOpening(){
+  const m = document.createDocumentFragment();
+  m.appendChild(el("h1",{text:"Which shift?"}));
+  const pick = el("div",{class:"shiftpick"});
+  [["AM","Opener's sheet"],["PM","Closer's sheet"]].forEach(([k,v])=>{
+    pick.appendChild(el("button",{type:"button","aria-pressed":String(S.shift===k),onclick:()=>{S.shift=k;render();}},[
+      el("span",{class:"k",text:k}), el("span",{class:"v",text:v})]));
+  });
+  m.appendChild(pick);
+  if(!S.shift) return m;
+  const pm = S.shift === "PM";
+
+  const paper = el("div",{class:"paper"});
+  const nameIn = el("input",{value:S.name,placeholder:"name","aria-label":"Name"});
+  nameIn.addEventListener("input",()=>{ S.name = nameIn.value; SAVED.name = S.name; persist(); });
+  paper.appendChild(el("div",{class:"hdr"},[
+    el("label",{},["Date:", el("span",{class:"val",text:S.date})]),
+    el("label",{},["Name:", nameIn]),
+    el("label",{style:"flex:0 0 auto;min-width:0"},["Shift:", el("span",{class:"val",text:S.shift})])
+  ]));
+  paper.appendChild(el("div",{class:"ptitle",text:"Opening Register Total"}));
+
+  const parMap = zero(); for(const d of D) parMap[d.k] = d.par;
+  const {table, tbody} = staticTable(parMap);
+  tbody.appendChild(el("tr",{},[el("td",{class:"lb",text:"Gift Cards"}),el("td"),el("td")]));
+  tbody.appendChild(el("tr",{},[el("td",{class:"lb",text:"Discounts"}),el("td"),el("td")]));
+  if(pm){
+    tbody.appendChild(el("tr",{},[
+      el("td",{class:"lb",html:"CC Total<small>AM count | AM total</small>"}),
+      el("td",{},countIn(()=>S.am.ccCount, v=>{S.am.ccCount=v; refreshBar();},{label:"AM card receipts"})),
+      el("td",{},moneyIn(()=>S.am.ccTotal, v=>{S.am.ccTotal=v; refreshBar();},{label:"AM card total"}))
+    ]));
+    tbody.appendChild(el("tr",{class:"grand"},[el("td",{class:"lb",text:"Total"}),el("td"),el("td",{class:"mute",text:"—"})]));
+  } else {
+    tbody.appendChild(el("tr",{},[el("td",{class:"lb",text:"CC Total"}),el("td"),el("td")]));
+    tbody.appendChild(el("tr",{class:"grand"},[el("td",{class:"lb",text:"Total"}),el("td"),el("td",{class:"tt",text:num(PAR_TOTAL)})]));
+  }
+  paper.appendChild(table);
+  paper.appendChild(el("div",{class:"pnote",text:S.shift+" shift always starts with a set $417.50 as shown."}));
+
+  if(pm){
+    const amBox = (label, key) => el("div",{class:"box"},[
+      el("div",{class:"bl",text:label}),
+      el("div",{style:"height:40px;margin-top:4px"},moneyIn(()=>S.am[key], v=>{S.am[key]=v; refreshBar();},{label:label,align:"r"}))
+    ]);
+    paper.appendChild(el("div",{class:"boxes two"},[amBox("AM Net Sales","net"), amBox("AM Deposit","deposit")]));
+    const c = carryToday();
+    if(c){
+      paper.appendChild(el("button",{class:"fillbtn",type:"button",
+        text:"Fill from this morning's AM sheet",
+        onclick:()=>{ S.am = {ccCount:c.ccCount, ccTotal:c.ccTotal, net:c.net, deposit:c.deposit}; render(); }}));
+    }
+  }
+  m.appendChild(paper);
+  m.appendChild(keyBox());
+  if(pm) m.appendChild(el("p",{class:"sub",style:"margin-top:10px",text:"Copy these four from the AM sheet. The card machine and the POS run all day, so PM needs AM's numbers to take them back out."}));
+  return m;
+}
+
+function keyBox(){
+  const has = !!getKey();
+  const inp = el("input",{type:"password",autocomplete:"off",placeholder:has?"Key saved on this phone":"Paste your Gemini API key","aria-label":"Gemini API key"});
+  const save = () => { try{ if(inp.value.trim()) localStorage.setItem(GEMINI_KEY, inp.value.trim()); }catch(e){} render(); };
+  const drop = () => { try{ localStorage.removeItem(GEMINI_KEY); }catch(e){} render(); };
+  return el("details",{class:"keybox"},[
+    el("summary",{text: has ? "Gemini photo reading: on" : "Gemini photo reading: off"}),
+    el("p",{text:"Optional. With a key, a camera button reads the paper sheet and Gemini can double-check the totals. The key is saved only on this phone, never in the page. In Google AI Studio, restrict it to this site’s address."}),
+    inp,
+    el("div",{class:"row"},[
+      el("button",{class:"wide",type:"button",style:"margin-top:0",text:"Save key",onclick:save}),
+      has ? el("button",{class:"wide",type:"button",style:"margin-top:0",text:"Remove key",onclick:drop}) : null
+    ])
+  ]);
+}
+function screenPetty(){
+  const m = document.createDocumentFragment();
+  const paper = el("div",{class:"paper"});
+  paper.appendChild(scanHeader("petty", S.petty, "Opening Petty Cash Total"));
+  const check = el("div");
+  const last = SAVED.lastPetty;
+  const paintCheck = () => {
+    check.textContent = "";
+    if(!last) return;
+    const now = total(S.petty);
+    const diff = now - last.total;
+    if(diff === 0) check.appendChild(el("div",{class:"note ok",html:"<b>Matches</b> the last closing count ("+last.shift+", "+last.date+")."}));
+    else check.appendChild(el("div",{class:"note warn",html:"<b>"+(diff>0?"Over":"Short")+" by $"+num(Math.abs(diff))+"</b> against the last closing count ("+last.shift+", "+last.date+": $"+num(last.total)+"). Recount before you trade anything."}));
+  };
+  const {table} = countTable(S.petty,{scanKey:"petty",onchange:()=>{ SAVED.petty = S.petty; persist(); paintCheck(); }});
+  paper.appendChild(table);
+  paper.appendChild(el("div",{class:"pnote",text: S.shift==="PM" ? "PM shift must verify AM count." : "Always count petty."}));
+  m.appendChild(paper);
+  m.appendChild(check);
+  paintCheck();
+  return m;
+}
+
+function screenClose(){
+  const m = document.createDocumentFragment();
+  const pm = S.shift === "PM";
+  const paper = el("div",{class:"paper"});
+  paper.appendChild(scanHeader("till", S.till, "Closing Register Total"));
+
+  const live = {};
+  const boxesHost = el("div");
+  const warnHost = el("div");
+  const xHost = el("div");
+  const update = () => {
+    const f = figures();
+    if(live.ccCount){
+      live.ccCount.textContent = has(S.ccCount) ? String(f.ccCount) : "";
+      live.cc.textContent = has(S.ccAmount) ? num(f.cc) : "";
+    }
+    live.total.textContent = num(f.tot);
+    boxesHost.textContent = ""; boxesHost.appendChild(boxes(f, true));
+    warnHost.textContent = "";
+    if(f.ccBad) warnHost.appendChild(el("div",{class:"note warn",html:"<b>Card machine reads less than AM's.</b> Enter the machine's full-day numbers here, not PM-only."}));
+    const short = D.filter(d => d.par && (S.till[d.k]||0) < d.par);
+    if(short.length && total(S.till) > 0)
+      warnHost.appendChild(el("div",{class:"note info",html:"<b>Under par:</b> "+short.map(d=>d.nm+" ("+(d.par-(S.till[d.k]||0))+")").join(", ")+". The result screen shows the exchange."}));
+    xHost.textContent = "";
+    if(f.overShort !== null){
+      const os = f.overShort;
+      xHost.appendChild(el("div",{class:"note "+(os===0?"ok":"warn"),html: os===0
+        ? "<b>Count matches the POS.</b> Expected $"+num(f.expected)+(pm?" (Expected Drawer − AM deposit)":"")+"."
+        : "<b>"+(os>0?"Over":"Short")+" $"+num(Math.abs(os))+".</b> Counted $"+num(f.cash)+", POS expects $"+num(f.expected)+(pm?" (Expected Drawer − AM deposit)":"")+". Recount before you continue."}));
+    }
+    if(f.posNetDiff !== null){
+      const d = f.posNetDiff;
+      xHost.appendChild(el("div",{class:"note "+(d===0?"ok":"warn"),html: d===0
+        ? "<b>"+(pm?"Grand total":"Net sales")+" matches</b> the POS Net Sales."
+        : "<b>"+(pm?"Grand total":"Net sales")+" is $"+num(Math.abs(d))+" "+(d>0?"above":"below")+"</b> the POS Net Sales ($"+num(f.posNet)+")."+(has(S.gift)&&cents(S.gift)?" Gift card payments could be the gap.":"")}));
+    }
+    refreshBar();
+  };
+
+  const {table, tbody} = countTable(S.till,{showPar:true,scanKey:"till",onchange:()=>{ if(live.total) update(); }});
+  tbody.appendChild(el("tr",{},[el("td",{class:"lb",html:"Gift Cards<small>sheet only</small>"}),el("td"),el("td",{},moneyIn(()=>S.gift,v=>{S.gift=v;},{label:"Gift cards",ph:""}))]));
+  tbody.appendChild(el("tr",{},[el("td",{class:"lb",html:"Discounts<small>sheet only</small>"}),el("td"),el("td",{},moneyIn(()=>S.disc,v=>{S.disc=v;},{label:"Discounts",ph:""}))]));
+
+  if(pm){
+    tbody.appendChild(el("tr",{},[
+      el("td",{class:"lb",html:"Card machine<small># receipts | total, all day</small>"}),
+      el("td",{},countIn(()=>S.ccCount,v=>{S.ccCount=v;},{label:"Card machine receipts",onchange:update})),
+      el("td",{},moneyIn(()=>S.ccAmount,v=>{S.ccAmount=v;},{label:"Card machine total",onchange:update}))
+    ]));
+    tbody.appendChild(el("tr",{class:"sub"},[
+      el("td",{class:"lb",text:"− AM"}),
+      el("td",{class:"ctr",text:S.am.ccCount||"0"}),
+      el("td",{class:"tt",text:num(cents(S.am.ccTotal))})
+    ]));
+    live.ccCount = el("td",{class:"ctr"});
+    live.cc = el("td",{class:"tt"});
+    tbody.appendChild(el("tr",{},[el("td",{class:"lb",text:"CC Total"}), live.ccCount, live.cc]));
+  } else {
+    tbody.appendChild(el("tr",{},[
+      el("td",{class:"lb",html:"CC Total<small># receipts | total</small>"}),
+      el("td",{},countIn(()=>S.ccCount,v=>{S.ccCount=v;},{label:"Card receipts",onchange:update})),
+      el("td",{},moneyIn(()=>S.ccAmount,v=>{S.ccAmount=v;},{label:"Card total",onchange:update}))
+    ]));
+  }
+  live.total = el("td",{class:"tt"});
+  tbody.appendChild(el("tr",{class:"grand"},[el("td",{class:"lb",html:"Total<small>cash + CC</small>"}), el("td"), live.total]));
+  paper.appendChild(table);
+  paper.appendChild(boxesHost);
+  m.appendChild(paper);
+  m.appendChild(warnHost);
+
+  // X report cross-check
+  const xp = el("div",{class:"paper"});
+  xp.appendChild(el("div",{class:"ptitle",text:"From the X report"}));
+  xp.appendChild(el("p",{class:"sub",style:"text-align:center;margin:-4px 0 8px",text:"Optional. Catches miscounts before the bag is sealed."}));
+  const {t:xt, tb:xtb} = sheetTable();
+  xt.querySelector("thead").remove();
+  xtb.appendChild(el("tr",{},[el("td",{class:"lb",html:"Expected Drawer"+(pm?"<small>full-day number</small>":"")}), el("td",{colspan:"2"},moneyIn(()=>S.pos.expected,v=>{S.pos.expected=v;},{label:"Expected drawer",ph:"",onchange:update}))]));
+  xtb.appendChild(el("tr",{},[el("td",{class:"lb",text:"Net Sales"}), el("td",{colspan:"2"},moneyIn(()=>S.pos.net,v=>{S.pos.net=v;},{label:"POS net sales",ph:"",onchange:update}))]));
+  xp.appendChild(xt);
+  xp.appendChild(xHost);
+  m.appendChild(xp);
+  update();
+  return m;
+}
+
+/* ---- result ---- */
+function tradeList(title, map, foot, emptyMsg){
+  const items = D.filter(d => (map[d.k]||0) > 0);
+  if(!items.length) return el("div",{class:"trade"},[el("h3",{text:title}), el("div",{class:"empty",text:emptyMsg||"Nothing to move."})]);
+  const ul = el("ul");
+  for(const d of items) ul.appendChild(el("li",{},[
+    tag(d), el("span",{class:"n",text:String(map[d.k])}), el("span",{class:"d",text:d.coin?"coins":"bills"}), el("span",{class:"v",text:"$"+num(map[d.k]*d.c)})
+  ]));
+  const node = el("div",{class:"trade"},[el("h3",{text:title}), ul]);
+  if(foot) node.appendChild(el("div",{class:"foot",text:foot}));
+  return node;
+}
+function listStr(map){
+  const parts = D.filter(d=>(map[d.k]||0)>0).map(d=>map[d.k]+" × "+d.nm);
+  return parts.length ? parts.join(", ") : "none";
+}
+
+function screenResult(){
+  const m = document.createDocumentFragment();
+  const pm = S.shift === "PM";
+  const plan = buildPlan(S.till, S.petty, S.pushBig);
+  const f = figures();
+
+  if(f.overShort) m.appendChild(el("div",{class:"note warn",html:"<b>Drawer is "+(f.overShort>0?"over":"short")+" $"+num(Math.abs(f.overShort))+"</b> against the X report. Everything below uses your count."}));
+
+  /* --- shortfall + exchange --- */
+  m.appendChild(el("h2",{class:"sechead",text:"What the drawer is short"}));
+  if(plan.shortList.length){
+    const sl = el("div",{class:"shortlist"});
+    for(const x of plan.shortList){
+      sl.appendChild(el("div",{class:"sl"+(x.left?" bad":"")},[
+        tag(BYK[x.k]),
+        el("div",{class:"k"},[el("div",{class:"meta",text:"counted "+x.counted+" of "+x.par})]),
+        el("div",{class:"v"},[el("div",{class:"big",text:x.miss+" short"}),
+          el("div",{class:"meta",text: x.left ? (x.got ? "petty covers "+x.got+", still short "+x.left : "petty has none") : "take "+x.got+" from petty"})])
+      ]));
+    }
+    m.appendChild(sl);
+  } else m.appendChild(el("p",{class:"subline",text:"Nothing. Every bill and coin is at or above par."}));
+
+  if(Object.keys(plan.hardShort).length && !plan.makeupValue && plan.makeupShort){
+    m.appendChild(el("div",{class:"note warn",html:"<b>Petty can't cover it.</b> Still short "+Object.keys(plan.hardShort).map(k=>plan.hardShort[k]+" × "+BYK[k].nm).join(", ")+". Get them from the safe or another drawer."}));
+  }
+  if(plan.impossible){
+    m.appendChild(el("div",{class:"note warn",html:"<b>No even swap exists.</b> The drawer needs "+listStr(plan.wanted.map)+" ($"+num(plan.wanted.value)+") but can't make that exact amount back. Nothing has been moved. Break a bill somewhere else first, then re-run."}));
+  }
+
+  m.appendChild(el("h2",{class:"sechead",text:"The exchange"}));
+  m.appendChild(el("p",{class:"subline",text: plan.swapValue ? "$"+num(plan.swapValue)+" moves each way. Petty and the drawer keep the same totals." : "No swap needed."}));
+  if(plan.swapValue){
+    m.appendChild(tradeList("From petty into the drawer", plan.give));
+    m.appendChild(tradeList("From the drawer back to petty", plan.back, "Even trade: $"+num(plan.swapValue)+" both ways"));
+  }
+  if(plan.pushes.length) m.appendChild(el("p",{class:"subline",style:"margin-top:8px",
+    text:plan.pushes.map(p=>BYK[p.big].nm).join(", ")+" came out of petty and go on to the deposit, swapped for small bills."}));
+  const tg = el("input",{type:"checkbox"}); tg.checked = S.pushBig;
+  tg.addEventListener("change",()=>{ S.pushBig = tg.checked; render(); });
+  m.appendChild(el("label",{class:"toggle"},[tg, el("span",{text:"Also clear $100s and $50s out of petty when the drawer can trade small bills for them"})]));
+  plan.notes.forEach(n=>m.appendChild(el("div",{class:"note info",text:n})));
+
+  /* --- the filled-out sheet --- */
+  m.appendChild(el("h2",{class:"sechead",text:"Your sheet"}));
+  m.appendChild(el("p",{class:"subline",text:"Copy this onto the paper."}));
+
+  const pp = el("div",{class:"paper"});
+  pp.appendChild(el("div",{class:"hdr"},[
+    el("label",{},["Date:", el("span",{class:"val",text:S.date})]),
+    el("label",{},["Name:", el("span",{class:"val",text:S.name||" "})]),
+    el("label",{style:"flex:0 0 auto;min-width:0"},["Shift:", el("span",{class:"val",text:S.shift})])
+  ]));
+  pp.appendChild(el("div",{class:"ptitle",text:"Closing Petty Cash Total"}));
+  pp.appendChild(staticTable(plan.pettyAfter).table);
+  pp.appendChild(el("div",{class:"pnote",text: plan.pettyDelta===0
+    ? "Same $"+num(total(plan.pettyAfter))+" as opening. Double count petty after making change."
+    : "Off by $"+num(plan.pettyDelta)+". Something is wrong; recount."}));
+  m.appendChild(pp);
+
+  const rp = el("div",{class:"paper"});
+  rp.appendChild(el("div",{class:"ptitle",text:"Closing Register Total"}));
+  const {table:rt, tbody:rb} = staticTable(S.till);
+  rb.appendChild(el("tr",{},[el("td",{class:"lb",text:"Gift Cards"}),el("td"),el("td",{class:"tt",text:has(S.gift)?num(cents(S.gift)):""})]));
+  rb.appendChild(el("tr",{},[el("td",{class:"lb",text:"Discounts"}),el("td"),el("td",{class:"tt",text:has(S.disc)?num(cents(S.disc)):""})]));
+  rb.appendChild(el("tr",{},[el("td",{class:"lb",html:"CC Total"+(pm?"<small>machine − AM</small>":"")}), el("td",{class:"ctr",text:String(f.ccCount)}), el("td",{class:"tt",text:num(f.cc)})]));
+  rb.appendChild(el("tr",{class:"grand"},[el("td",{class:"lb",text:"Total"}), el("td"), el("td",{class:"tt",text:num(f.tot)})]));
+  rp.appendChild(rt);
+  rp.appendChild(boxes(f));
+  m.appendChild(rp);
+
+  if(pm && f.posNetDiff === null) m.appendChild(el("div",{class:"note info",html:"<b>Free check:</b> Grand Total should equal the Net Sales on tonight's X report. Add it on the previous screen to verify."}));
+
+  /* --- deposit bag --- */
+  m.appendChild(el("h2",{class:"sechead",text:"Deposit bag"}));
+  m.appendChild(el("p",{class:"subline",text:"Pull these from the drawer. What's left is exactly $417.50 at par."}));
+  m.appendChild(tradeList("Into the bag", plan.deposit, "Deposit total: $"+num(plan.depositTotal), "Drawer is at par. Nothing to deposit."));
+  if(plan.makeupValue){
+    m.appendChild(tradeList("Leave in the drawer", plan.makeup, "Stands in for the missing "+plan.shortList.filter(x=>x.left).map(x=>x.nm).join(", ")+": $"+num(plan.makeupValue)));
+    m.appendChild(el("div",{class:"note info",text:"Petty didn't have the right bills, so the drawer keeps $"+num(plan.makeupValue)+" in other bills to stay at $417.50. Swap them for the right ones when you can."}));
+  }
+  if(plan.makeupShort) m.appendChild(el("div",{class:"note warn",html:"<b>The drawer closes $"+num(plan.makeupShort)+" short</b> of $417.50 and can't make it up from its own surplus. Pull the difference from the safe."}));
+  if(plan.depositTotal !== f.deposit) m.appendChild(el("div",{class:"note warn",html:"<b>Bag ($"+num(plan.depositTotal)+") doesn't match Deposit Total ($"+num(f.deposit)+")</b> because the drawer couldn't be brought back to $417.50."}));
+
+  /* --- second opinion --- */
+  m.appendChild(el("h2",{class:"sechead",text:"Second opinion"}));
+  m.appendChild(aiBox(plan, f));
+
+  const cp = el("button",{class:"wide plain",type:"button",text:"Copy the summary"});
+  cp.addEventListener("click",()=>{
+    const t = summaryText(plan,f);
+    const done = () => { cp.textContent = "Copied"; setTimeout(()=>cp.textContent="Copy the summary",1600); };
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done).catch(()=>fallbackCopy(t,done));
+    else fallbackCopy(t,done);
+  });
+  m.appendChild(cp);
+
+  /* --- remember for the next shift --- */
+  SAVED.lastPetty = {total: total(plan.pettyAfter), shift: S.shift, date: S.date};
+  SAVED.petty = plan.pettyAfter;
+  if(!pm){
+    SAVED.carry = {date: todayStr(), ccCount: S.ccCount, ccTotal: S.ccAmount,
+                   net: (f.net/100).toFixed(2), deposit: (f.deposit/100).toFixed(2)};
+  }
+  persist();
+  return m;
+}
+
+function fallbackCopy(t, done){
+  const ta = el("textarea"); ta.value = t; ta.style.cssText = "position:fixed;opacity:0;top:0;left:0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){}
+  ta.remove();
+}
+function summaryText(plan, f){
+  const pm = S.shift === "PM", L = [];
+  L.push(S.shift+" shift — "+S.date+(S.name?" — "+S.name:""));
+  L.push("");
+  L.push("EXCHANGE ($"+num(plan.swapValue)+" each way)");
+  L.push("  petty -> drawer: "+listStr(plan.give));
+  L.push("  drawer -> petty: "+listStr(plan.back));
+  L.push("Petty: $"+num(total(plan.pettyAfter)));
+  L.push("");
+  L.push("Cash Total: $"+num(f.cash));
+  if(has(S.gift)) L.push("Gift Cards: $"+num(cents(S.gift)));
+  if(has(S.disc)) L.push("Discounts: $"+num(cents(S.disc)));
+  L.push("CC Total: ("+f.ccCount+") $"+num(f.cc)+(pm?"  [machine ("+f.machineCount+") $"+num(f.machineCC)+" − AM ("+f.amCount+") $"+num(f.amCC)+"]":""));
+  L.push("Total: $"+num(f.tot));
+  L.push("Net Sales: $"+num(f.net));
+  if(pm) L.push("Grand Total: $"+num(f.grand)+"  (AM $"+num(f.amNet)+" + PM $"+num(f.net)+")");
+  L.push("Deposit Total: $"+num(f.deposit));
+  L.push("  bag: "+listStr(plan.deposit));
+  if(f.overShort !== null) L.push("Over/short vs POS: $"+num(f.overShort));
+  return L.join("\n");
+}
+
+/* ============ second opinion ============ */
+function aiBox(plan, f){
+  const box = el("div",{class:"paper"});
+  if(!getKey()){ box.appendChild(el("p",{style:"margin:0;font-size:14.5px;color:var(--muted)",text:"Add a Gemini key on the first screen to have Gemini check these numbers. All the math above runs on your phone either way."})); return box; }
+  const out = el("div",{class:"aiout",role:"status"});
+  const btn = el("button",{class:"wide",type:"button",style:"margin-top:0",text:"Check these numbers with Gemini"});
+  box.appendChild(btn); box.appendChild(out);
+  btn.addEventListener("click", async () => {
+    btn.disabled = true; out.textContent = "Checking…";
+    try{
+      const data = await gemini(MODEL_FAST, buildPrompt(plan,f));
+      out.textContent = "";
+      const ok = data && data.status === "ok";
+      out.appendChild(el("div",{class:"hd",style:"color:"+(ok?"var(--good)":"var(--bad)"),text: ok?"Nothing looks off.":"Worth a second look."}));
+      const list = (data && Array.isArray(data.findings)) ? data.findings : [];
+      if(list.length){ const ul = el("ul"); list.slice(0,6).forEach(x=>ul.appendChild(el("li",{text:String(x)}))); out.appendChild(ul); }
+      if(data && data.suggestion) out.appendChild(el("p",{style:"margin:8px 0 0",text:String(data.suggestion)}));
+    }catch(e){ out.innerHTML = geminiError(e); }
+    finally{ btn.disabled = false; }
+  });
+  return box;
+}
+function buildPrompt(plan, f){
+  const pm = S.shift === "PM";
+  return [
+"You are checking a retail cash-drawer closing sheet for arithmetic and procedural errors. Be terse and concrete. Do not restate what is correct.",
+"",
+"HOUSE RULES",
+"- Every shift's drawer is set at par: 5 x $20, 10 x $10, 25 x $5, 75 x $1, 40 quarters, 50 dimes, 40 nickels, 50 pennies = $417.50.",
+"- Any denomination below par is topped up from petty cash; the drawer pays petty back the same VALUE from its surplus. Petty total and drawer total never change from a swap.",
+"- AM: CC Total = card machine. Total = cash + CC. Net Sales = Total - 417.50. Deposit = cash - 417.50.",
+"- The card machine and POS run all day. The AM deposit physically leaves the drawer at AM close.",
+"- PM: CC Total = machine total - AM CC total (receipts likewise). Total = PM counted cash + PM CC. Net Sales = Total - 417.50. Grand Total = AM Net + PM Net. Deposit = PM cash - 417.50. POS Expected Drawer - AM deposit should equal the PM counted cash.",
+"",
+"SHIFT: "+S.shift,
+"Petty counted: $"+num(total(S.petty))+" ["+listStr(S.petty)+"]",
+"Drawer counted: $"+num(f.cash)+" ["+listStr(S.till)+"]",
+pm ? "AM carry-over: CC ("+f.amCount+") $"+num(f.amCC)+", AM net $"+num(f.amNet)+", AM deposit $"+num(f.amDep) : "",
+"Card machine: ("+f.machineCount+") $"+num(f.machineCC),
+"",
+"SWAP ($"+num(plan.swapValue)+" each way): petty->drawer "+listStr(plan.give)+"; drawer->petty "+listStr(plan.back),
+"Petty after: $"+num(total(plan.pettyAfter))+" ("+(plan.pettyDelta===0?"unchanged":"CHANGED by $"+num(plan.pettyDelta))+")",
+"Drawer left: "+listStr(plan.drawerFinal)+" = $"+num(plan.drawerFinalTotal),
+"Bag: "+listStr(plan.deposit)+" = $"+num(plan.depositTotal),
+"",
+"SHEET: CC Total ("+f.ccCount+") $"+num(f.cc)+"; Total $"+num(f.tot)+"; Net $"+num(f.net)+(pm?"; Grand $"+num(f.grand):"")+"; Deposit $"+num(f.deposit),
+f.expected!==null ? "POS expected cash: $"+num(f.expected)+" (over/short $"+num(f.overShort)+")" : "",
+f.posNet!==null ? "POS Net Sales: $"+num(f.posNet)+" (sheet "+(pm?"grand":"net")+" differs by $"+num(f.posNetDiff)+")" : "",
+"",
+"Check every formula and the swap. Flag anything implausible (negative PM card numbers, net below zero, bag not equal to deposit, over/short).",
+'Reply with ONLY a JSON object: {"status":"ok"|"issues","findings":["short sentence",...],"suggestion":"one line, or empty"}.'
+  ].filter(x=>x!=="").join("\n");
+}
+
+/* ============ render ============ */
+function canAdvance(){
+  if(S.step === 0){
+    if(!S.shift) return false;
+    if(S.shift === "PM") return has(S.am.ccCount) && has(S.am.ccTotal) && has(S.am.net) && has(S.am.deposit);
+    return true;
+  }
+  if(S.step === 2){
+    if(!has(S.ccAmount) || !has(S.ccCount)) return false;
+    return !figures().ccBad;
+  }
+  return true;
+}
+let goBtn = null;
+function refreshBar(){
+  if(!goBtn) return;
+  if(canAdvance()) goBtn.removeAttribute("disabled"); else goBtn.setAttribute("disabled","");
+}
+function render(){
+  const main = document.getElementById("main");
+  main.textContent = "";
+  goBtn = null;
+  main.appendChild([screenOpening,screenPetty,screenClose,screenResult][S.step]());
+
+  const chip = document.getElementById("chip");
+  chip.textContent = S.shift ? S.shift+" shift" : "no shift";
+  chip.className = "chip"+(S.shift?" on":"");
+  const tr = document.getElementById("track"); tr.textContent = "";
+  STEPS.forEach((_,i)=>tr.appendChild(el("i",{class:i<S.step?"done":(i===S.step?"now":"")})));
+  const sn = document.getElementById("stepname"); sn.textContent = "Step "+(S.step+1)+" of "+STEPS.length+": "; sn.appendChild(el("b",{text:STEPS[S.step]}));
+
+  const bar = document.getElementById("bar"); bar.textContent = "";
+  if(S.step > 0) bar.appendChild(el("button",{class:"btn ghost",type:"button",text:"Back",onclick:()=>{S.step--;render();window.scrollTo(0,0);}}));
+  if(S.step < STEPS.length-1){
+    goBtn = el("button",{class:"btn go",type:"button",text:S.step===2?"See the result":"Continue",
+      onclick:()=>{ if(!canAdvance()) return; S.step++; render(); window.scrollTo(0,0); }});
+    bar.appendChild(goBtn);
+    refreshBar();
+  } else {
+    bar.appendChild(el("button",{class:"btn go",type:"button",text:"Start a new shift",
+      onclick:()=>{ for(const k in scanInfo) delete scanInfo[k]; const keepName = S.name; S = {step:0,shift:null,name:keepName,date:todayStr(),petty:Object.assign(zero(),SAVED.petty||{}),till:zero(),gift:"",disc:"",ccCount:"",ccAmount:"",am:{ccCount:"",ccTotal:"",net:"",deposit:""},pos:{expected:"",net:""},pushBig:true}; render(); window.scrollTo(0,0); }}));
+  }
+}
+render();
+</script>
+</body>
+</html>
